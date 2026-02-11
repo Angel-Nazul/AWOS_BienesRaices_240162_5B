@@ -1,0 +1,35 @@
+{
+  "name": "awos_bienesraices_240162_5b",
+  "version": "1.0.0",
+  "description": "Sistema De BienesRaizes basado en NodeJS, MVC y API REST",
+  "keywords": [
+    "MVC",
+    "Sequelize",
+    "NodeJS",
+    "API",
+    "reset",
+    "Tailwindcss",
+    "Leaflet"
+  ],
+  "homepage": "https://github.com/Angel-Nazul/AWOS_BienesRaices_240162_5B#readme",
+  "bugs": {
+    "url": "https://github.com/Angel-Nazul/AWOS_BienesRaices_240162_5B/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Angel-Nazul/AWOS_BienesRaices_240162_5B.git"
+  },
+  "license": "ISC",
+  "author": "Angel Nazul Gutierrez Cruz",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
