@@ -8,6 +8,8 @@
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
     --color-orange-600: oklch(64.6% 0.222 41.116);
+    --color-gray-100: oklch(96.7% 0.003 264.542);
+    --spacing: 0.25rem;
     --text-2xl: 1.5rem;
     --text-2xl--line-height: calc(2 / 1.5);
     --font-weight-extrabold: 800;
@@ -164,6 +166,42 @@
   }
 }
 @layer utilities {
+  .container {
+    width: 100%;
+    @media (width >= 40rem) {
+      max-width: 40rem;
+    }
+    @media (width >= 48rem) {
+      max-width: 48rem;
+    }
+    @media (width >= 64rem) {
+      max-width: 64rem;
+    }
+    @media (width >= 80rem) {
+      max-width: 80rem;
+    }
+    @media (width >= 96rem) {
+      max-width: 96rem;
+    }
+  }
+  .mx-auto {
+    margin-inline: auto;
+  }
+  .mt-10 {
+    margin-top: calc(var(--spacing) * 10);
+  }
+  .block {
+    display: block;
+  }
+  .min-h-screen {
+    min-height: 100vh;
+  }
+  .bg-gray-100 {
+    background-color: var(--color-gray-100);
+  }
+  .px-2 {
+    padding-inline: calc(var(--spacing) * 2);
+  }
   .text-center {
     text-align: center;
   }
