@@ -1,16 +1,12 @@
 import express from 'express'
+import { formularioLogin, formularioRegistro} from '../controllers/usuarioController.js'
 
 const router = express.Router();
 
 // Definir los ENDPOINTS
 // GET
-router.get("/", (req, res)=>{
-    console.log("Se esta procesando una petición del tipo GET")
-    res.json({
-        status:200, 
-        message: "Bienvenido al Sistema de Bienes Raices"
-    })
-})
+router.get("/login", formularioLogin)
+router.get("/registro", formularioRegistro)
 
 
 //POST
@@ -68,6 +64,7 @@ router.patch("/actualizarPassword/:nuevoPassword", (req, res)=>
     })
 })
 
+//DELETE
 router.delete("/borrarPropiedad/:id", (req, res)=>{
     console.log("Se esta procesando una petición del tipo DELETE");
     const {id} = req.params;
