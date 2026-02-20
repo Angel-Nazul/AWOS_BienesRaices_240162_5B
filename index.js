@@ -1,6 +1,7 @@
+//console.log("Hola desde JS");
 import express from 'express'
 import usuarioroutes from './routes/usuarioroutes.js'
-
+import { connectDB } from './config/db.js';
 
 //Crea una constancia de contenedor WEB
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.static('public'))
 
 
 app.use("/auth", usuarioroutes)
+await connectDB();
 
 app.listen(PORT, ()=>{
     console.log(`Èl servidor esta iniciado en el puerto ${PORT}`)
