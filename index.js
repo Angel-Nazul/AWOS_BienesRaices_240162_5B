@@ -14,6 +14,8 @@ app.set("views", "./views")
 //Definimos el Template Engine (PUG)
 app.use(express.static('public'))
 
+//Habilitar lectura de datos a traves de las peticiones (REQUEST)
+app.use(express.urlencoded({extended: true}))
 
 app.use("/auth", usuarioroutes)
 await connectDB();

@@ -8,7 +8,7 @@ block contenido
 
   .mt-8.mx-auto.max-w-xl
     .bg-white.py-8.px-4.shadow-2xl.rounded-2xl
-      form.space-y-5
+      form.space-y-5(method="POST" action="/auth/registro")
         div.px-5
           label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="nombreUsuario") nombre completo:
           input#nombreUsuario.w-full.border.border-gray-300.px-3.py-2.rounded-xl.placeholder-gray-400.bg-white.transition-(
@@ -31,8 +31,8 @@ block contenido
           label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="paswordUsuario") contraseña:
           input#passwordUsuario.w-full.border.border-gray-300.px-3.py-2.rounded-xl.placeholder-gray-400.bg-white.transition-(
             placeholder="Por lo menos 8 caracteres"
-            name="paswordUsuario"
-            type="pasword"
+            name="passwordUsuario"
+            type="password"
             class="hover:inset-shadow-sm focus:inset-shadow-md focus:inset-shado-300/50 focus:outline-none"
           )
 
@@ -41,7 +41,7 @@ block contenido
           input#confirmacionUsuario.w-full.border.border-gray-300.px-3.py-2.rounded-xl.placeholder-gray-400.bg-white.transition-(
             placeholder="Repite la contraseña anterior"
             name="confirmacionUsuario"
-            type="pasword"
+            type="password"
             class="hover:inset-shadow-sm focus:inset-shadow-md focus:inset-shado-300/50 focus:outline-none"
           )
 
