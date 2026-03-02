@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import db from "../config/db.js"
-//import bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt';
 //import crypto from 'crypto';
 
 const Usuario = db.define('Usuario', {
@@ -52,10 +52,10 @@ const Usuario = db.define('Usuario', {
         allowNull: false,
         defaultValue: false
     },
-    tokenRecovery: {
+    token: {
         type: DataTypes.STRING(255),
         allowNull: true,
-        field: 'token_recovery'
+        field: 'token'
     },
     tokenExpiration: {
         type: DataTypes.DATE,
@@ -83,7 +83,7 @@ const Usuario = db.define('Usuario', {
         //Has de contraseña antes de crear
         beforeCreate: async (usuario) =>{
             if (usuario.password) {
-                const salt = await bccrypt.genSalt(parseInt(process.env.BCCRYPT_ROUNDS) || 10);
+                const salt = await bcrypt.genSalt(parseInt(process.env.BCCRYPT_ROUNDS) || 10);
                 usuario.password = await bcrypt.hash(usuario.password, salt);
             }
         },
@@ -91,7 +91,7 @@ const Usuario = db.define('Usuario', {
         //Hash de contraseña antes de actualizar (si cambio)
         beforeUpdate: async (usuario) =>{
             if (usuario.changed('password')) {
-                const salt = await bccrypt.genSalt(parseInt(process.env.BCCRYPT_ROUNDS) || 10);
+                const salt = await bcrypt.genSalt(parseInt(process.env.BCCRYPT_ROUNDS) || 10);
                 usuario.password = await bcrypt.hash(usuario.password, salt);
             }
         }
