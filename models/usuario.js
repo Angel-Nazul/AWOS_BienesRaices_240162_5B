@@ -16,7 +16,7 @@ const Usuario = db.define('Usuario', {
         validate:
         {
             notEmpty:{
-                msg:'La contraseña no puede estar vacia'}
+                msg:'El nombre no puede estar vacia'}
         }
     },
     email:{
@@ -78,6 +78,24 @@ const Usuario = db.define('Usuario', {
     underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
+
+    hooks: {
+        //Has de contraseña antes de crear
+        beforeCreate: async (usuario) =>{
+            if (usuario.password) {
+                const salt = await bccrypt.genSalt(parseInt(process.env.BCCRYPT_ROUNDS) || 10);
+                usuario.password = await bcrypt.hash(usuario.password, salt);
+            }
+        },
+
+        //Hash de contraseña antes de actualizar (si cambio)
+        beforeUpdate: async (usuario) =>{
+            if (usuario.changed('password')) {
+                const salt = await bccrypt.genSalt(parseInt(process.env.BCCRYPT_ROUNDS) || 10);
+                usuario.password = await bcrypt.hash(usuario.password, salt);
+            }
+        }
+    }
 });
 
 export default Usuario;

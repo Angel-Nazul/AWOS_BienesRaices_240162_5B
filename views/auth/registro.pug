@@ -1,14 +1,19 @@
 extends ../layout/index
 
 block contenido
-  .py-10
+  .py-1
   h1.text-4xl.my-10.font-extrabold.text-center.text-red-600 Bienes
     span.font-normal.text-black Raíces
   h2.text-center.text-2xl.font-normal.text-black Por favor ingresa cuidadosamente tus datos
 
+   if errores 
+            .max-w-md.mx-auto.my-10 
+                each error in errores 
+                    p.bg-red-600.text-white.uppercase.text-xs.text-center.p-2.mb-1.font-bold= error.msg
+
   .mt-8.mx-auto.max-w-xl
     .bg-white.py-8.px-4.shadow-2xl.rounded-2xl
-      form.space-y-5(method="POST" action="/auth/registro")
+      form.space-y-5(method="POST" action="/auth/registro" noValidate)
         div.px-5
           label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="nombreUsuario") nombre completo:
           input#nombreUsuario.w-full.border.border-gray-300.px-3.py-2.rounded-xl.placeholder-gray-400.bg-white.transition-(
@@ -16,6 +21,7 @@ block contenido
             name="nombreUsuario"
             type="text"
             class="hover:inset-shadow-sm focus:inset-shadow-xl focus:inset-shado-300 focus:outline-none"
+            value= usuario ? usuario.nombreUsuario: ''
           )
 
         div.px-5
@@ -25,6 +31,7 @@ block contenido
             name="emailUsuario"
             type="email"
             class="hover:inset-shadow-sm focus:inset-shadow-md focus:inset-shado-300/50 focus:outline-none"
+            value= usuario ? usuario.emailUsuario: ''
           )
 
         div.px-5

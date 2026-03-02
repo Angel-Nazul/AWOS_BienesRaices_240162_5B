@@ -28,7 +28,10 @@
     "watch:css": "npx @tailwindcss/cli -i ./src/css/styles.css -o ./public/css/styles.css --watch"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "crypto": "^1.0.1",
     "express": "^5.2.1",
+    "express-validator": "^7.3.1",
     "mysql2": "^3.17.4",
     "pug": "^3.0.3",
     "sequelize": "^6.37.7"
