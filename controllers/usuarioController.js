@@ -55,21 +55,21 @@ const registrarUsuario = async(req,res) =>
         token: generarToken()
         }
     const usuario = await Usuario.create(data);
-
+    console.log("Enviando el correo ....")
     //Enviar el correo electronico
     emailRegistro({
     nombre: usuario.name,
     email: usuario.email,
-    token:usuario.token
-})
+    token:usuario.token})
+    console.log("El correo ha sido enviado")
 
-
-res.render("templates/mensaje", {
+    res.render("templates/mensaje", {
   title: "Bienvenido a Bienesfacies!",
-  msg: `La cuenta asociada al correo: {$email}, se ha creado exitosamente, te pedimos confirmar tu a través del correo electrónico que te hemos enviado.`,
+  msg: `La cuenta asociada al correo: ${email}, se ha creado exitosamente, te pedimos confirmar tu a través del correo electrónico que te hemos enviado.`,
 });
 
 }    
+    else 
         res.render("auth/registro", { 
             pagina: "Error al interar crear una cuenta.", 
             errores: resultadoValidacion.array(), 
@@ -84,7 +84,7 @@ const paginaConfirmacion = async(req, res) =>
      const {token:tokenCuenta} = req.params
      console.log("Confirmando la cuenta asociada al token: ", tokenCuenta);
 
-     //Confirmar si el toke existe
+     //Confirmar si el toke existe en la BD
      const usuarioToken = await(Usuario.findOne({where:{token:tokenCuenta }}))
      console.log(usuarioToken);
 
