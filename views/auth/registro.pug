@@ -16,40 +16,40 @@ block contenido
       form.space-y-5(method="POST" action="/auth/registro" noValidate)
         div.px-5
           label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="nombreUsuario") nombre completo:
-          input#nombreUsuario.w-full.border.border-gray-300.px-3.py-2.rounded-xl.placeholder-gray-400.bg-white.transition-(
+          input#nombreUsuario.w-full.border.border-gray-300.px-3.py-2.rounded-xl.placeholder-gray-400.bg-white.transition-shadow.duration-200(
             placeholder="Ej: Angel Nazul Gutiérrez Cruz"
             name="nombreUsuario"
             type="text"
-            class="hover:inset-shadow-sm focus:inset-shadow-xl focus:inset-shado-300 focus:outline-none"
+            class="hover:inset-shadow-sm hover:shadow-[0_-4px_0_0_#ef4444] focus:inset-shadow-xl focus:inset-shado-300 focus:outline-none"
             value= usuario ? usuario.nombreUsuario: ''
           )
 
         div.px-5
           label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="emailUsuario") correo electrónico:
-          input#emailUsuario.w-full.border.border-gray-300.px-3.py-2.rounded-xl.placeholder-gray-400.bg-white.transition-(
+          input#emailUsuario.w-full.border.border-gray-300.px-3.py-2.rounded-xl.placeholder-gray-400.bg-white.transition-shadow.duration-200(
             placeholder="Ej: usuario@dominio.com"
             name="emailUsuario"
             type="email"
-            class="hover:inset-shadow-sm focus:inset-shadow-md focus:inset-shado-300/50 focus:outline-none"
+            class="hover:inset-shadow-sm hover:shadow-[0_-4px_0_0_#ef4444] focus:inset-shadow-md focus:inset-shado-300/50 focus:outline-none"
             value= usuario ? usuario.emailUsuario: ''
           )
 
         div.px-5
           label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="paswordUsuario") contraseña:
-          input#passwordUsuario.w-full.border.border-gray-300.px-3.py-2.rounded-xl.placeholder-gray-400.bg-white.transition-(
+          input#passwordUsuario.w-full.border.border-gray-300.px-3.py-2.rounded-xl.placeholder-gray-400.bg-white.transition-shadow.duration-200(
             placeholder="Por lo menos 8 caracteres"
             name="passwordUsuario"
             type="password"
-            class="hover:inset-shadow-sm focus:inset-shadow-md focus:inset-shado-300/50 focus:outline-none"
+            class="hover:inset-shadow-sm hover:shadow-[0_-4px_0_0_#ef4444] focus:inset-shadow-md focus:inset-shado-300/50 focus:outline-none"
           )
 
         div.px-5
           label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="confirmacionUsuario") Confirmacion de contraseña:
-          input#confirmacionUsuario.w-full.border.border-gray-300.px-3.py-2.rounded-xl.placeholder-gray-400.bg-white.transition-(
+          input#confirmacionUsuario.w-full.border.border-gray-300.px-3.py-2.rounded-xl.placeholder-gray-400.bg-white.transition-shadow.duration-200(
             placeholder="Repite la contraseña anterior"
             name="confirmacionUsuario"
             type="password"
-            class="hover:inset-shadow-sm focus:inset-shadow-md focus:inset-shado-300/50 focus:outline-none"
+            class="hover:inset-shadow-sm hover:shadow-[0_-4px_0_0_#ef4444] focus:inset-shadow-md focus:inset-shado-300/50 focus:outline-none"
           )
 
         input(class="w-full bg-gray-300 text-red-600 hover:bg-red-600 hover:text-white font-bold py-3 cursor-pointer rounded-4xl shadow-lg uppercase transition-all.duration-200" type="submit" value="Registrar Usuario")

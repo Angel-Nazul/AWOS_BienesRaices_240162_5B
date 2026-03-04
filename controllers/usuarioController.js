@@ -1,6 +1,7 @@
 import {check, validationResult } from 'express-validator'
 import Usuario from '../models/usuario.js'
 import {generarToken} from '../lib/tokens.js'
+import {emailRegistro } from '../lib/emails.js'
 
 const formularioLogin = (req, res) =>{
     res.render("auth/login", {pagina: "Inicia sesión"});
@@ -54,10 +55,21 @@ const registrarUsuario = async(req,res) =>
         token: generarToken()
         }
     const usuario = await Usuario.create(data);
-    res.json(usuario)
-}
 
-    
+    //Enviar el correo electronico
+    emailRegistro({
+    nombre: usuario.name,
+    email: usuario.email,
+    token:usuario.token
+})
+
+
+res.render("templates/mensaje", {
+  title: "Bienvenido a Bienesfacies!",
+  msg: `La cuenta asociada al correo: {$email}, se ha creado exitosamente, te pedimos confirmar tu a través del correo electrónico que te hemos enviado.`,
+});
+
+}    
         res.render("auth/registro", { 
             pagina: "Error al interar crear una cuenta.", 
             errores: resultadoValidacion.array(), 
