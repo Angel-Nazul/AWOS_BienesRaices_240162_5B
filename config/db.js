@@ -50,6 +50,7 @@ export const connectDB = async () => {
     try{
         await sequelize.authenticate();
         console.log("✅ Conexion a MySQL establecida correctamente");
+        sequelize.sync();
     } catch (error) {
         console.error("❌ Error conectado a la BD:", error);
         process.exit(1);
