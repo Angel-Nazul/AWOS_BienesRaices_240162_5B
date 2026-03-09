@@ -24,7 +24,7 @@ app.use(express.json());
 
 // Definimos el Middleware  - 
 app.use(session({
-    secret: process.env.SESSION_SECRET||"PC-BienesRaices_MATRICULA_csrf_secret",
+    secret: process.env.SESSION_SECRET||"PC-BienesRaices_240162_csrf_secret",
     resave: false,
     saveUninitialized: false, 
     cookie: {

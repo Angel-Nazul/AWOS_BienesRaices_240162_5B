@@ -19,8 +19,8 @@ router.post("/createUser", (req, res) =>
     {
         console.log("Se esta procesando una petición del tipo POST")
         const nuevoUsuario = {
-            nombre:"Marco A. Ramírez",
-            correo:"marco@gmail.com"
+            nombre:"Angel Nazul Gutierrez Cruz",
+            correo:"a.nazul.gc@gmail.com"
         }
 
         res.json({

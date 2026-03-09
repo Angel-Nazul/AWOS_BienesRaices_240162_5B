@@ -98,4 +98,49 @@ const Usuario = db.define('Usuario', {
     }
 });
 
+/*
+  // Métodos de instancia
+  Usuario.prototype.validarPassword = async function(password) {
+    return await bcrypt.compare(password, this.password);
+  };
+
+  Usuario.prototype.generarTokenRecuperacion = function() {
+    // Generar token aleatorio
+    const token = crypto.randomBytes(20).toString('hex');
+    this.tokenRecuperacion = token;
+    // Token válido por 1 hora
+    this.tokenExpiracion = new Date(Date.now() + 3600000);
+    return token;
+  };
+
+  Usuario.prototype.validarTokenRecuperacion = function(token) {
+    return this.tokenRecuperacion === token && 
+           this.tokenExpiracion > new Date();
+  };
+
+  Usuario.prototype.limpiarTokenRecuperacion = function() {
+    this.tokenRecuperacion = null;
+    this.tokenExpiracion = null;
+  };
+
+  // Métodos estáticos
+  Usuario.findByEmail = function(email) {
+    return this.findOne({ 
+      where: { 
+        email: email,
+        regStatus: true 
+      } 
+    });
+  };
+
+  Usuario.findByTokenRecuperacion = function(token) {
+    return this.findOne({
+      where: {
+        tokenRecuperacion: token,
+        tokenExpiracion: { [sequelize.Sequelize.Op.gt]: new Date() },
+        regStatus: true
+      }
+    });
+  };*/
+
 export default Usuario;
