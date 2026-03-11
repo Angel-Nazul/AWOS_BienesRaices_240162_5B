@@ -1,6 +1,6 @@
 import express from 'express'
 import {formularioLogin, formularioRecuperacion, formularioRegistro, registrarUsuario,
-    paginaConfirmacion
+    paginaConfirmacion, formularioActualizacionPassword, resetearPassword
 } from '../controllers/usuarioController.js'
 
 const router = express.Router();
@@ -9,12 +9,17 @@ const router = express.Router();
 // GET
 router.get("/login", formularioLogin)
 router.get("/registro", formularioRegistro)
-router.get("/recuperarPasword", formularioRecuperacion)
+router.get("/recuperarPassword", formularioRecuperacion)
+router.get("/recuperarPassword/:token", formularioRecuperacion)
 router.get("/confirma/:token", paginaConfirmacion)
+router.get("/actualizarPassword/:token", formularioActualizacionPassword)
 
 
 //POST
 router.post("/registro", registrarUsuario)
+router.post("/recuperarPassword", resetearPassword)
+router.post("/recuperarPassword/:token", resetearPassword)
+
 router.post("/createUser", (req, res) =>
     {
         console.log("Se esta procesando una petición del tipo POST")
@@ -57,8 +62,8 @@ router.patch("/actualizarPassword/:nuevoPassword", (req, res)=>
 {
     console.log("Se esta procesando una petición del tipo PATCH");
     const usuario = {
-        nombre: "Damián Romero",
-        correo: "d.romero@gmail.com", 
+        nombre: "Angel Nazul Gutierrez Cruz",
+        correo: "a.nazul.gc@gmail.com", 
         password: "123456789"        
     }
 
