@@ -144,7 +144,7 @@ const resetearPassword = async(req, res) =>
             errores: resultadoValidacion.array(), 
             usuario: { emailUsuario: email  }});
      }
-     
+
     // Validación 1
     const usuario = await Usuario.findOne({where: { email: usuarioSolicitante}});
     // SELECT email FROM tb_users WHERE email =  usuarioSolicitante;   // SQL Injection
@@ -194,4 +194,30 @@ const resetearPassword = async(req, res) =>
 }
 }
 
-export { formularioLogin, formularioRegistro, registrarUsuario, formularioRecuperacion, paginaConfirmacion, resetearPassword, formularioActualizacionPassword}
+const autenticarUsuario = async(req,res) => {
+    const {emailUsuario: email, passwordUsuario: password} = req.body
+    console.log(`Un usuario: ${email} con password: ${password}quiere logearse al sistema`);
+
+    //Validaciones de front campos no vacios
+     await check('emailUsuario').notEmpty().withMessage("El correo electrónico no puede ser vacío").isEmail().withMessage("El correo electrónico no tiene un formato adecuado").run(req)
+    await check('passwordUsuario').notEmpty().withMessage("La contraseña parece estar vacía").isLength({ min: 8 , max:30}).withMessage("La longitud de la contraseña debe ser entre 8 y 30 caractéres").run(req);
+
+    let resultadoValidacion = validationResult(req);
+
+    if(!resultadoValidacion.isEmpty())
+    {
+        res.render("auth/login", { 
+            pagina: "Error al intentar ingresar a la plataforma", 
+            errores: resultadoValidacion.array(), 
+            usuario: { emailUsuario: email  }});
+    }
+
+
+    //Validacion de backend (buscar el usuario en bd)
+
+    //Validacion de backend (comparar contraseñas con correo)
+
+    //Renderizar la pagina de Bienvenida
+}
+ 
+export { formularioLogin, formularioRegistro, registrarUsuario, formularioRecuperacion, paginaConfirmacion, resetearPassword, formularioActualizacionPassword, autenticarUsuario}
