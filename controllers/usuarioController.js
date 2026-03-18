@@ -14,7 +14,7 @@ const formularioRegistro = (req,res) =>
 const registrarUsuario = async(req,res) =>
 {
     console.log("Intentando registrar a un Usuario Nuevo con los datos del formulario:");
-    console.log(req.body);
+    /*console.log(req.body);*/
     const {nombreUsuario:name, emailUsuario: email, passwordUsuario:password} = req.body 
 
 
@@ -130,6 +130,21 @@ const resetearPassword = async(req, res) =>
     const {emailUsuario:usuarioSolicitante} = req.body
     console.log(`El usuario con correo: ${usuarioSolicitante} esta solicitando un reseteo de contraseña.`)
 
+    const {emailUsuario: email} = req.body 
+
+     // Validaciones del Frontend 
+     await check('emailUsuario').notEmpty().withMessage("El correo electrónico no puede ser vacío").isEmail().withMessage("El correo electrónico no tiene un formato adecuado").run(req)
+    
+     let resultadoValidacion = validationResult(req);
+
+     if(!resultadoValidacion.isEmpty())
+     {
+         res.render("auth/recuperarPassword", { 
+            pagina: "Error, correo inválido", 
+            errores: resultadoValidacion.array(), 
+            usuario: { emailUsuario: email  }});
+     }
+     
     // Validación 1
     const usuario = await Usuario.findOne({where: { email: usuarioSolicitante}});
     // SELECT email FROM tb_users WHERE email =  usuarioSolicitante;   // SQL Injection
