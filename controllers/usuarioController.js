@@ -1,8 +1,7 @@
 import {check, validationResult } from 'express-validator'
 import Usuario from '../models/Usuario.js'
-import {generarToken} from '../lib/tokens.js'
+import {generarJWT, generarToken} from '../lib/tokens.js'
 import {emailRegistro, emailResetearPassword} from '../lib/emails.js'
-
 const formularioLogin = (req, res) => {
      res.render("auth/login", {pagina: "Inicia sesión"});
 }
@@ -212,8 +211,47 @@ const autenticarUsuario = async(req,res) => {
             usuario: { emailUsuario: email  }});
     }
 
-
     //Validacion de backend (buscar el usuario en bd)
+    const usuario = await Usuario.findOne({where:{email}});
+
+    if(!usuario)
+    {
+        res.render("auth/login", {
+            pagina: "Error al intentar ingresar a la plataforma",
+            errores: [{"msg": `No existe un usuario asociado a : ${email}`}]
+        })
+    }
+
+    //Validacion de backend (si la cuenta esta confirmada)
+    else if(!usuario.confirmed)
+    {
+        res.render("auth/login",{
+            pagina: "Error al intentar ingresar a la plataforma",
+            errores: [{"msg": `La cuenta asociada a : ${email} no a sido confirmado`}]
+        });
+    }
+
+    else
+    {
+        console.log("Validando Contraseñas")
+        console.log("->",usuario.validarPassword(password),"<-");
+    
+            if(!usuario.validarPassword(password))
+            {
+                res.render("auth/login", { 
+                pagina:"Error al intentar ingresar a la plataforma",
+                errores: [{"msg": `Contraseña incorrecta intenta de nuevo`}]
+            }); //examen bloqueo al 5to intento
+        }
+        else
+        {
+            const token =generarJWT(usuario.id);
+            console.log(token);
+            res.render("main/mis-propiedades", {
+                pagina: "Menu principal del usuario",
+            });
+        }
+    }
 
     //Validacion de backend (comparar contraseñas con correo)
 

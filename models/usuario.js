@@ -98,6 +98,12 @@ const Usuario = db.define('Usuario', {
     }
 });
 
+
+//Metodos de instancia
+Usuario.prototype.validarPassword = function(password) {
+    return bcrypt.compareSync(password, this.password);
+};
+
 /*
   // Métodos de instancia
   Usuario.prototype.validarPassword = async function(password) {
