@@ -2,10 +2,14 @@ extends ../layout/index
 
 block contenido
     .py-1
-        h1.text-4xl.my-10.font-extrabold.text-center.text-orange-400 Bienes
+        h1.text-4xl.my-10.font-extrabold.text-center.text-red-600 Bienes
             span.font-normal.text-black Raíces
         h2.text-center.text-2xl.font-normal.text-black= title
     
     .mt-8.mx-auto.max-w-xl
             .bg-white.py-8.px-4.shadow-2xl.rounded-2xl
                 p.text-xl.text-bold.text-center.my-10= msg
+
+                div.flex.justify-center.py-6
+                    if buttonVisibility
+                        a(class="w-3/4 bg-gray-300 text-red-600 hover:bg-red-600 hover:text-white font-bold py-3 cursor-pointer rounded-4xl shadow-lg uppercase transition-all duration-200 text-center block" href="/auth/recuperarPassword")= buttonText
