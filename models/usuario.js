@@ -1,7 +1,6 @@
 import { DataTypes } from "sequelize";
-import db from "../config/db.js"
-import bcrypt from 'bcrypt';
-//import crypto from 'crypto';
+import db from "../config/db.js";
+import bcrypt from "bcrypt";
 
 const Usuario = db.define('Usuario', {
     id: {
@@ -11,136 +10,63 @@ const Usuario = db.define('Usuario', {
         allowNull: false
     },
     name: {
-        type:DataTypes.STRING(100),
-        allowNull:false,
-        validate:
-        {
-            notEmpty:{
-                msg:'El nombre no puede estar vacia'}
-        }
-    },
-    email:{
         type: DataTypes.STRING(100),
-        allowNull:false,
-        unique: {
-            msg: 'El email ya esta registrado'
-        },
-        validate:{
-            isEmail:{
-                msg: 'Debe proporcinar un email valido'
-            },
-            notEmpty:{
-                msg: 'El email no puede estar vacio'
-            }
+        allowNull: false
+    },
+    email: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        unique: true,
+        validate: {
+            isEmail: true
         }
     },
     password: {
         type: DataTypes.STRING(255),
-        allowNull: false,
-        validate:{
-            notEmpty:{
-                msg: 'Lacontraseña no puede estar vacia'
-            },
-            len: {
-                arsg: [8, 100],
-                msg: 'La contraseña debe tener almenos 8 caracteres'
-            }
-        }
+        allowNull: true 
+    },
+    imagen: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    token: {
+        type: DataTypes.STRING
     },
     confirmed: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
         defaultValue: false
     },
-    token: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
-        field: 'token'
+    intentos: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
     },
-    tokenExpiration: {
-        type: DataTypes.DATE,
-        allowNull: true,
-        field: 'token_expiration'
-    },
-    regStatus: {
+    bloqueado: {
         type: DataTypes.BOOLEAN,
-        defaultValue: true,
-        field: 'reg_status'
-    },
-    lastLogin: {
-        type: DataTypes.DATE,
-        allowNull: true,
-        field: 'last_login'
+        defaultValue: false
     }
 }, {
     tableName: 'tb_users',
-    timestamps: true,
-    underscored: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
-
+    timestamps: false,
     hooks: {
-        //Has de contraseña antes de crear
-        beforeCreate: async (usuario) =>{
-            if (usuario.password) {
-                const salt = await bcrypt.genSalt(parseInt(process.env.BCCRYPT_ROUNDS) || 10);
+        beforeSave: async (usuario) => {
+            if (usuario.changed('password') && usuario.password) {
+                const salt = await bcrypt.genSalt(10);
                 usuario.password = await bcrypt.hash(usuario.password, salt);
             }
-        },
-
-        //Hash de contraseña antes de actualizar (si cambio)
-        beforeUpdate: async (usuario) =>{
-            if (usuario.changed('password')) {
-                const salt = await bcrypt.genSalt(parseInt(process.env.BCCRYPT_ROUNDS) || 10);
-                usuario.password = await bcrypt.hash(usuario.password, salt);
+        }
+    },
+    scopes: {
+        eliminarPassword: {
+            attributes: {
+                exclude: ['password', 'token', 'confirmed', 'intentos', 'bloqueado']
             }
         }
     }
 });
 
-/*
-  // Métodos de instancia
-  Usuario.prototype.validarPassword = async function(password) {
-    return await bcrypt.compare(password, this.password);
-  };
-
-  Usuario.prototype.generarTokenRecuperacion = function() {
-    // Generar token aleatorio
-    const token = crypto.randomBytes(20).toString('hex');
-    this.tokenRecuperacion = token;
-    // Token válido por 1 hora
-    this.tokenExpiracion = new Date(Date.now() + 3600000);
-    return token;
-  };
-
-  Usuario.prototype.validarTokenRecuperacion = function(token) {
-    return this.tokenRecuperacion === token && 
-           this.tokenExpiracion > new Date();
-  };
-
-  Usuario.prototype.limpiarTokenRecuperacion = function() {
-    this.tokenRecuperacion = null;
-    this.tokenExpiracion = null;
-  };
-
-  // Métodos estáticos
-  Usuario.findByEmail = function(email) {
-    return this.findOne({ 
-      where: { 
-        email: email,
-        regStatus: true 
-      } 
-    });
-  };
-
-  Usuario.findByTokenRecuperacion = function(token) {
-    return this.findOne({
-      where: {
-        tokenRecuperacion: token,
-        tokenExpiracion: { [sequelize.Sequelize.Op.gt]: new Date() },
-        regStatus: true
-      }
-    });
-  };*/
+Usuario.prototype.verificarPassword = function(password) {
+    if (!this.password) return false;
+    return bcrypt.compareSync(password, this.password);
+};
 
 export default Usuario;

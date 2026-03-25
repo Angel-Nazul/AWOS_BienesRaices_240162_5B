@@ -1,6 +1,8 @@
 import express from 'express'
+import passport from "passport";
+import { check } from 'express-validator';
 import {formularioLogin, formularioRecuperacion, formularioRegistro, registrarUsuario,
-    paginaConfirmacion, formularioActualizacionPassword, resetearPassword, actualizarPassword
+    paginaConfirmacion, formularioActualizacionPassword, resetearPassword, autenticarUsuario, formularioEditarFoto, desbloquearCuenta, cerrarSesion, actualizarFoto, nuevoPassword
 } from '../controllers/usuarioController.js'
 
 const router = express.Router();
@@ -13,14 +15,49 @@ router.get("/recuperarPassword", formularioRecuperacion)
 router.get("/recuperarPassword/:token", formularioRecuperacion)
 router.get("/confirma/:token", paginaConfirmacion)
 router.get("/actualizarPassword/:token", formularioActualizacionPassword)
+router.get("/perfil/editar-foto", formularioEditarFoto);
+router.get("/desbloquear/:token", desbloquearCuenta);
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
+router.get('/google/callback', passport.authenticate('google', { successRedirect: '/mis-propiedades', failureRedirect: '/auth/login' }));
+router.get('/github', passport.authenticate('github', { scope: [ 'user:email' ] }));
+router.get('/github/callback', passport.authenticate('github', { successRedirect: '/mis-propiedades', failureRedirect: '/auth/login' }));
+router.get('/logout', cerrarSesion);
 
 
 //POST
-router.post("/registro", registrarUsuario)
-router.post("/recuperarPassword", resetearPassword)
-router.post("/recuperarPassword/:token", resetearPassword)
-router.post("/actualizarPassword", actualizarPassword)
 
+ // Validaciones para login
+router.post("/login", [
+    check('emailUsuario').isEmail().withMessage('El email es obligatorio').trim(),
+    check('passwordUsuario').notEmpty().withMessage('La contraseña es obligatoria')
+], autenticarUsuario);
+
+// Validaciones para registro
+router.post("/registro", [
+    check('nombreUsuario').notEmpty().withMessage('El nombre es obligatorio').trim(),
+    check('emailUsuario').isEmail().withMessage('Email no válido').trim(),
+    check('passwordUsuario').isLength({ min: 8 }).withMessage('Mínimo 8 caracteres'),
+    check('confirmacionUsuario').custom((value, { req }) => {
+        if(value !== req.body.passwordUsuario) {
+            throw new Error('Las contraseñas no coinciden')
+        }
+        return true
+    })
+], registrarUsuario);
+
+// Validaciones para recuperar contraseña (solo email)
+router.post("/recuperarPassword", [
+    check('emailUsuario').isEmail().withMessage('Email no válido').trim()
+], resetearPassword);
+
+// Ruta para actualizar contraseña con token (POST)
+router.post("/actualizarPassword/:token", [
+    check('nuevoPassword').isLength({ min: 8 }).withMessage('Mínimo 8 caracteres')
+], nuevoPassword);
+
+// Ruta para actualizar foto (POST) - sin validaciones en el router, pero se pueden agregar
+router.post("/perfil/editar-foto", actualizarFoto);
+    
 router.post("/createUser", (req, res) =>
     {
         console.log("Se esta procesando una petición del tipo POST")
@@ -34,7 +71,7 @@ router.post("/createUser", (req, res) =>
             message: `Se ha solicitado la creación de un nuevo usuario con nombre: ${nuevoUsuario.nombre} y correo: ${nuevoUsuario.correo}`
         })
     })
-    
+
 //PUT - Actualización Completa
 router.put("/actualizarOferta/",(req, res)=>{
     console.log("Se esta procesando una petición del tipo PUT");

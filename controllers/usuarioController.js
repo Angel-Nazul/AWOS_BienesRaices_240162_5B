@@ -1,14 +1,20 @@
 import {check, validationResult } from 'express-validator'
-import Usuario from '../models/Usuario.js'
-import {generarToken} from '../lib/tokens.js'
-import {emailRegistro, emailResetearPassword} from '../lib/emails.js'
+import Usuario from '../models/usuario.js'
+import {generarJWT, generarToken} from '../lib/tokens.js'
+import {emailRegistro, emailResetearPassword, emailDesbloqueo} from '../lib/emails.js'
 
 const formularioLogin = (req, res) => {
-     res.render("auth/login", {pagina: "Inicia sesión"});
+     res.render("auth/login", {
+        pagina: "Inicia sesión",
+        csrfToken: req.csrfToken()
+    });
 }
-const formularioRegistro = (req,res) =>
-{
-    res.render("auth/registro", {pagina: "Registrate con nosotros :)"});
+
+const formularioRegistro = (req,res) =>{
+    res.render("auth/registro", {
+        pagina: "Registrate con nosotros :)",
+        csrfToken: req.csrfToken()
+    });
 }
 
 const registrarUsuario = async(req,res) =>
@@ -23,18 +29,32 @@ const registrarUsuario = async(req,res) =>
     await check('nombreUsuario').notEmpty().withMessage("El nombre de la persona no puede ser vacío").run(req);
     await check('emailUsuario').notEmpty().withMessage("El correo electrónico no puede ser vacío").isEmail().withMessage("El correo electrónico no tiene un formato adecuado").run(req)
     await check('passwordUsuario').notEmpty().withMessage("La contraseña parece estar vacía").isLength({ min: 8 , max:30}).withMessage("La longitud de la contraseña debe ser entre 8 y 30 caractéres").run(req);
-    await check('confirmacionUsuario').equals(password).withMessage("Ambas contraseñas deben ser iguales").run(req);
+    await check('confirmacionUsuario').custom((value, { req }) => {
+        if (value !== req.body.passwordUsuario) {
+            throw new Error("Las contraseñas no coinciden");
+        }
+        return true;
+    }).run(req)
 
     // aplicamos la reglas definidas
     let resultadoValidacion = validationResult(req);
 
-    // Verificar si el usuario no esta previamente registrado en la bd
-    const existeUsuario = await Usuario.findOne({where: {email}})
+    if (!resultadoValidacion.isEmpty()) {
+        return res.render("auth/registro", {
+            pagina: "Regístrate con nosotros :)",
+            csrfToken: req.csrfToken(),
+            errores: resultadoValidacion.array(),
+            usuario: { nombreUsuario, emailUsuario}
+        });
+    }
 
+    // Verificar si el usuario no esta previamente registrado en la bd
+    const existeUsuario = await Usuario.findOne({where: {email: emailUsuario}});
 
     if(existeUsuario)
     {  res.render("auth/registro", { 
             pagina: "Registrate con nosotros :) ", 
+            csrfToken: req.csrfToken(),
             errores: [{msg:` Ya existe un usuario asociado al correo: ${email}`}],
             usuario: { nombreUsuario: name,           
             }});
@@ -115,22 +135,30 @@ const paginaConfirmacion = async(req, res) =>
 
 const formularioRecuperacion = (req,res) =>
 {
-    res.render("auth/recuperarPassword", {pagina: "Te ayudamos a restaurar tu contraseña"});
+    res.render("auth/recuperarPassword", {pagina: "Te ayudamos a restaurar tu contraseña", csrfToken: req.csrfToken()});
 }
 
-const formularioActualizacionPassword = async(req,res) =>
-{
-    console.log(req.body)
-    const {token} = req.params; 
-    console.log(`El usuario con token :${token} esta intentando actualizar su contraseña`);
+const formularioActualizacionPassword = async (req, res) => {
+    const { token } = req.params;
+    const usuario = await Usuario.findOne({ where: { token } });
 
-    const usuarioSolicitante =  await Usuario.findOne({where: {token}});
-    console.log(`El usuario dueño del  token es :${usuarioSolicitante.email}`);
-   
-    res.render("auth/resetearPassword", {pagina: "Ingresa tu nueva contraseña", 
-        email: usuarioSolicitante.email
+    if (!usuario) {
+        return res.render("templates/mensaje", {
+            title: "Error",
+            pagina: "Enlace no válido",
+            msg: "El token de recuperación ha expirado o es incorrecto.",
+            buttonVisibility: true,
+            buttonText: "Volver",
+            buttonURL: "/auth/recuperarPassword"
+        });
+    }
+
+    res.render("auth/resetearPassword", {
+        pagina: "Ingresa tu nueva contraseña",
+        csrfToken: req.csrfToken(),
+        token: token
     });
-}
+};
 
 const resetearPassword = async(req, res) =>
 {
@@ -144,15 +172,15 @@ const resetearPassword = async(req, res) =>
         
         let resultadoValidacion = validationResult(req);
 
-    if(!resultadoValidacion.isEmpty())
-        {
-            res.render("auth/recuperarPassword", { 
-                pagina: "Error, correo inválido", 
-                errores: resultadoValidacion.array(), 
-                usuario: { emailUsuario: email  }});
-        }
-     
-    // Validación Backend - Existe el usuario?
+     if(!resultadoValidacion.isEmpty())
+     {
+         res.render("auth/recuperarPassword", { 
+            pagina: "Error, correo inválido", 
+            errores: resultadoValidacion.array(), 
+            usuario: { emailUsuario: email  }});
+     }
+
+    // Validación 1
     const usuario = await Usuario.findOne({where: { email: usuarioSolicitante}});
     // SELECT email FROM tb_users WHERE email =  usuarioSolicitante;   // SQL Injection
     if(!usuario)
@@ -201,24 +229,192 @@ const resetearPassword = async(req, res) =>
 }
 }
 
-const actualizarPassword = async(req, res) => {
-    const {emailSolicitante: email, passwordUsuario:password } = req.body
-    console.log(`Actualizando  la contraseña del usuario con email: ${email} a nivel backend - base de datos.`)
+const nuevoPassword = async (req, res) => {
+    await check('nuevoPassword').isLength({ min: 8 }).withMessage('Mínimo 8 caracteres').run(req);
+    
+    let resultado = validationResult(req);
+    if (!resultado.isEmpty()) {
+        return res.render("auth/resetearPassword", {
+            pagina: "Ingresa tu nueva contraseña",
+            csrfToken: req.csrfToken(),
+            token: req.params.token,   // <-- necesario para la vista
+            errores: resultado.array()
+        });
+    }
 
-    //Validaciones de Frontend
-     await check('passwordUsuario').notEmpty().withMessage("La contraseña parece estar vacía").isLength({ min: 8 , max:30}).withMessage("La longitud de la contraseña debe ser entre 8 y 30 caractéres").run(req);
-    await check('confirmacionUsuario').equals(password).withMessage("Ambas contraseñas deben ser iguales").run(req);
+    const { token } = req.params;
+    const { nuevoPassword } = req.body; 
+    const usuario = await Usuario.findOne({ where: { token } });
 
-    // aplicamos la reglas definidas
+    if(!usuario) {
+        return res.render("templates/mensaje", {
+            title: "Error",
+            pagina: "Token inválido",
+            msg: "No se pudo identificar al usuario para el cambio de clave."
+        });
+    }
+
+    usuario.password = nuevoPassword; 
+    usuario.token = null;
+    usuario.intentos = 0;
+    usuario.bloqueado = false;
+    await usuario.save();
+
+    res.render("templates/mensaje", {
+        title: "Contraseña Actualizada",
+        pagina: "¡Cambio Exitoso!",
+        msg: "Tu contraseña se actualizó correctamente. Ya puedes iniciar sesión.",
+        buttonVisibility: true,
+        buttonText: "Iniciar sesión",
+        buttonURL: "/auth/login"
+    });
+};
+
+const autenticarUsuario = async(req,res) => {
+    const {emailUsuario: email, passwordUsuario: password} = req.body
+    console.log(`Un usuario: ${email} con password: ${password}quiere logearse al sistema`);
+
+    //Validaciones de front campos no vacios
+     await check('emailUsuario').notEmpty().withMessage("El correo electrónico no puede ser vacío").isEmail().withMessage("El correo electrónico no tiene un formato adecuado").run(req)
+    await check('passwordUsuario').notEmpty().withMessage("La contraseña parece estar vacía").isLength({ min: 8 , max:30}).withMessage("La longitud de la contraseña debe ser entre 8 y 30 caractéres").run(req);
+
     let resultadoValidacion = validationResult(req);
 
     if(!resultadoValidacion.isEmpty())
-        {
-            res.render("auth/resetearPassword", { 
-                pagina: "Error al intentar actualizar la contraseña", 
-                errores: resultadoValidacion.array()});
-        }
-
+    {
+        res.render("auth/login", { 
+            pagina: "Error al intentar ingresar a la plataforma", 
+            errores: resultadoValidacion.array(), 
+            usuario: { emailUsuario: email  }});
     }
 
-export { formularioLogin, formularioRegistro, registrarUsuario, formularioRecuperacion, paginaConfirmacion, resetearPassword, formularioActualizacionPassword, actualizarPassword}
+    //Validacion de backend (buscar el usuario en bd)
+    const usuario = await Usuario.findOne({where:{email}});
+
+    if(!usuario)
+    {
+        res.render("auth/login", {
+            pagina: "Error al intentar ingresar a la plataforma",
+            errores: [{"msg": `No existe un usuario asociado a : ${email}`}]
+        })
+    }
+
+    if(usuario.bloqueado){
+    return res.render("auth/login", {
+        pagina: "Inicia sesión",
+        csrfToken: req.csrfToken(),
+        errores: [{ msg: "Cuenta bloqueada. Revisa tu email para desbloquearla." }]
+    });
+}
+
+    //Validacion de backend (si la cuenta esta confirmada)
+    else if(!usuario.confirmed)
+    {
+        res.render("auth/login",{
+            pagina: "Error al intentar ingresar a la plataforma",
+            errores: [{"msg": `La cuenta asociada a : ${email} no a sido confirmado`}]
+        });
+    }
+
+    else
+    {
+        console.log("Validando Contraseñas")
+        console.log("->",usuario.validarPassword(password),"<-");
+    
+            if(!usuario.validarPassword(password))
+{
+    usuario.intentos++;
+    if(usuario.intentos >= 5){
+        usuario.bloqueado = true;
+        usuario.token = generarToken();
+        try {
+            await emailDesbloqueo({ nombre: usuario.name, email: usuario.email, token: usuario.token });
+        } catch (error) {
+            console.error("Error enviando correo de desbloqueo");
+        }
+    }
+    await usuario.save();
+    return res.render("auth/login", {
+        pagina: "Inicia sesión",
+        csrfToken: req.csrfToken(),
+        errores: [{ msg: `Contraseña incorrecta. Intentos restantes: ${5 - usuario.intentos}` }],
+        usuario: { emailUsuario: email }
+    });
+}
+        else
+        {
+            usuario.intentos = 0;
+            await usuario.save();
+            req.login(usuario, (err) => {
+            if (err) return next(err);
+            return res.redirect("/mis-propiedades");
+            });
+            const token =generarJWT(usuario.id);
+            console.log(token);
+            res.render("main/mis-propiedades", {
+                pagina: "Menu principal del usuario",
+            });
+        }
+    }
+
+    //Validacion de backend (comparar contraseñas con correo)
+
+    //Renderizar la pagina de Bienvenida
+}
+ 
+const cerrarSesion = (req, res, next) => {
+    req.logout(function(err) {
+        if (err) return next(err);
+        req.session.destroy(() => {
+            res.clearCookie('connect.sid');
+            res.redirect('/auth/login');
+        });
+    });
+};
+
+const desbloquearCuenta = async (req, res) => {
+    const { token } = req.params;
+    const usuario = await Usuario.findOne({ where: { token } });
+    if (!usuario) {
+        return res.render("templates/mensaje", {
+            title: "Error",
+            pagina: "Enlace no válido",
+            msg: "El enlace de desbloqueo ha expirado."
+        });
+    }
+    usuario.bloqueado = false;
+    usuario.intentos = 0;
+    usuario.token = null;
+    await usuario.save();
+
+    res.render("templates/mensaje", {
+        title: "Cuenta Desbloqueada",
+        pagina: "¡Listo!",
+        msg: "Tu cuenta ha sido desbloqueada. Ya puedes iniciar sesión.",
+        buttonVisibility: true,
+        buttonText: "Iniciar Sesión",
+        buttonURL: "/auth/login"
+    });
+};
+
+const formularioEditarFoto = (req, res) => {
+    res.render('auth/editar-foto', {
+        pagina: 'Editar Foto de Perfil',
+        csrfToken: req.csrfToken(),
+        usuario: req.user
+    });
+};
+
+const actualizarFoto = async (req, res) => {
+    const { nuevaImagen } = req.body;
+    try {
+        const usuario = await Usuario.findByPk(req.user.id);
+        usuario.imagen = nuevaImagen;
+        await usuario.save();
+        res.redirect('/mis-propiedades');
+    } catch (error) {
+        res.redirect('/mis-propiedades');
+    }
+};
+
+export { formularioLogin, formularioRegistro, registrarUsuario, formularioRecuperacion, paginaConfirmacion, resetearPassword, formularioActualizacionPassword, autenticarUsuario, nuevoPassword, cerrarSesion, desbloquearCuenta,formularioEditarFoto, actualizarFoto}

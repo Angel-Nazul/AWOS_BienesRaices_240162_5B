@@ -1,0 +1,29 @@
+header.bg-red-600.p-4
+    .container.mx-auto.flex.justify-between.items-center
+        a(href="/")
+            h1.text-2xl.text-white.font-extrabold.text-center Bienes 
+                span.font-normal Raices
+
+        nav(class="my-5 text-sm md:flex md:items-center md:gap-4 font-bold text-white hidden") 
+            if usuario
+                div.flex.items-center.gap-3.bg-red-600.py-2.px-4.rounded-full.shadow-md
+                    if usuario.imagen
+                        img(src=usuario.imagen class="w-8 h-8 rounded-full border-2 border-white" alt="Avatar")
+                    else
+                        div.w-8.h-8.bg-red-600.rounded-full.flex.items-center.justify-center.border.border-white
+                            span.text-xs.text-white #{usuario.name.charAt(0).toUpperCase()}
+                    
+                    span.font-medium Hola, #{usuario.name.split(' ')[0]}
+
+                a(href="/mis-propiedades" class="hover:text-red-200 transition-colors") Mis Propiedades
+                a(href="/auth/perfil" class="hover:text-red-200 transition-colors") Mi Perfil
+                
+                a(href="/auth/logout" class="bg-red-800 py-2 px-6 rounded-lg hover:bg-red-600 transition-all duration-300") Cerrar Sesión
+            else
+                a(href="/auth/registro" class="hover:text-blue-600 transition-colors") Crear Cuenta
+                a(href="/auth/login" class="hover:text-blue-600 transition-colors") Iniciar Sesión
+
+        div(class="md:hidden")
+            button.text-white
+                svg(xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor")
+                    path(stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7")
