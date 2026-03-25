@@ -1,0 +1,21 @@
+extends ../layout/index
+
+block contenido
+    div.py-10
+        h2.text-center.text-2xl.font-extrabold= pagina
+
+        div(class="bg-white shadow py-8 px-4 rounded mx-auto max-w-2xl my-10")
+            form(method="POST" action="/auth/perfil/editar-foto")
+                input(type="hidden" name="_csrf" value=csrfToken)
+                
+                div.mb-5
+                    label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="nuevaImagen") URL de la nueva imagen
+                    input#nuevaImagen.w-full.px-3.py-2.border.border-gray-300.rounded-md(placeholder="Pega el enlace de tu imagen aquí" type="text" name="nuevaImagen" value=usuario.imagen)
+                
+                div.flex.justify-center.mb-5
+                    if usuario.imagen
+                        img(src=usuario.imagen class="w-32 h-32 rounded-full border-4 border-indigo-600 object-cover" referrerpolicy="no-referrer")
+
+                input(class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 cursor-pointer uppercase rounded transition-colors" type="submit" value="Actualizar Foto")
+                
+                a.text-center.block.text-gray-500.text-xs.uppercase.mt-5(href="/mis-propiedades") Volver

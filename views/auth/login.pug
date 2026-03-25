@@ -35,7 +35,22 @@ block contenido
 
         input(class="w-full bg-gray-300 text-red-600 hover:bg-red-600 hover:text-white font-bold py-3 cursor-pointer rounded-4xl shadow-lg uppercase transition-all.duration-200" type="submit" value="Inisiar sesion")
 
+        div.relative.py-4
+          div.absolute.inset-0.flex.items-center
+            div.w-full.border-t.border-gray-200
+          div.relative.flex.justify-center.text-xs.uppercase
+            span.bg-white.px-2.text-gray-400 O continúa con
+
+        div.px-5.space-y-3
+          a(href="/auth/google" class="flex items-center justify-center gap-3 bg-[#1f1f1f] hover:bg-[#333333] text-white font-medium py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 border border-gray-700 w-full")
+            img(src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-6 h-6" alt="Google Logo")
+            span Continuar con Google
+
+          a(href="/auth/github" class="flex items-center justify-center gap-3 bg-[#24292e] hover:bg-[#1a1e22] text-white font-medium py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 border border-gray-800 w-full")
+            img(src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" class="w-6 h-6 invert" alt="GitHub Logo")
+            span Continuar con GitHub
+
         div.flex.items-center.justify-between.pt-3
-          a.text-gray-500.text-sm.hover-decoration-red-600.hover-underline.transition.decoration-2(href="/auth/registro") ¿No tienes cuenta? Regístrate
+          a.text-gray-500.text-sm.hover-decoration-red-600.hover-underline.transition.decoration-2(href="/auth/registro" class="hover:text-red-600 transition-colors") ¿No tienes cuenta? Regístrate
           
-          a.text-gray-500.text-sm.hover-decoration-red-600.hover-underline.transition.decoration-2(href="/auth/recuperarPassword") ¿Olvidaste tu contraseña? Recuperarla
+          a.text-gray-500.text-sm.hover-decoration-red-600.hover-underline.transition.decoration-2(href="/auth/recuperarPassword" class="hover:text-red-600 transition-colors") ¿Olvidaste tu contraseña? Recuperarla
