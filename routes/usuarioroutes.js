@@ -1,6 +1,7 @@
 import express from 'express'
 import passport from "passport";
 import { check } from 'express-validator';
+import * as usuarioController from '../controllers/usuarioController.js';
 import {formularioLogin, formularioRecuperacion, formularioRegistro, registrarUsuario,
     paginaConfirmacion, formularioActualizacionPassword, resetearPassword, autenticarUsuario, formularioEditarFoto, desbloquearCuenta, cerrarSesion, actualizarFoto, nuevoPassword
 } from '../controllers/usuarioController.js'
@@ -71,6 +72,8 @@ router.post("/createUser", (req, res) =>
             message: `Se ha solicitado la creación de un nuevo usuario con nombre: ${nuevoUsuario.nombre} y correo: ${nuevoUsuario.correo}`
         })
     })
+
+router.post('/nuevo-password/:token', usuarioController.nuevoPassword);
 
 //PUT - Actualización Completa
 router.put("/actualizarOferta/",(req, res)=>{

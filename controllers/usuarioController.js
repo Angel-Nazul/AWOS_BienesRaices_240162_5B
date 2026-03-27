@@ -20,12 +20,9 @@ const formularioRegistro = (req,res) =>{
 const registrarUsuario = async(req,res) =>
 {
     console.log("Intentando registrar a un Usuario Nuevo con los datos del formulario:");
-    /*console.log(req.body);*/
     const {nombreUsuario:name, emailUsuario: email, passwordUsuario:password} = req.body 
 
-
     // Validación de los datos del formulario previo a registro en la BD
-    // Definir reglas de validacion
     await check('nombreUsuario').notEmpty().withMessage("El nombre de la persona no puede ser vacío").run(req);
     await check('emailUsuario').notEmpty().withMessage("El correo electrónico no puede ser vacío").isEmail().withMessage("El correo electrónico no tiene un formato adecuado").run(req)
     await check('passwordUsuario').notEmpty().withMessage("La contraseña parece estar vacía").isLength({ min: 8 , max:30}).withMessage("La longitud de la contraseña debe ser entre 8 y 30 caractéres").run(req);
@@ -36,7 +33,6 @@ const registrarUsuario = async(req,res) =>
         return true;
     }).run(req)
 
-    // aplicamos la reglas definidas
     let resultadoValidacion = validationResult(req);
 
     if (!resultadoValidacion.isEmpty()) {
@@ -44,29 +40,26 @@ const registrarUsuario = async(req,res) =>
             pagina: "Regístrate con nosotros :)",
             csrfToken: req.csrfToken(),
             errores: resultadoValidacion.array(),
-            usuario: { nombreUsuario, emailUsuario}
+            usuario: { nombreUsuario: name, emailUsuario: email }
         });
     }
 
-    // Verificar si el usuario no esta previamente registrado en la bd
-    const existeUsuario = await Usuario.findOne({where: {email: emailUsuario}});
+    // Verificar si el usuario ya existe
+    const existeUsuario = await Usuario.findOne({where: {email: email}});
 
-    if(existeUsuario)
-    {  res.render("auth/registro", { 
+    if(existeUsuario) {
+        return res.render("auth/registro", { 
             pagina: "Registrate con nosotros :) ", 
             csrfToken: req.csrfToken(),
             errores: [{msg:` Ya existe un usuario asociado al correo: ${email}`}],
-            usuario: { nombreUsuario: name,           
-            }});
+            usuario: { nombreUsuario: name, emailUsuario: email }
+        });
     }
 
-
-    // Validar si hay errores en la recepción de datos , si no mandar a bd
-
+    // Si no hay errores, crear usuario
     if(resultadoValidacion.isEmpty())
     {
-        const data =
-        {
+        const data = {
             name, 
             email, 
             password,
@@ -74,29 +67,26 @@ const registrarUsuario = async(req,res) =>
         }
         const usuario = await Usuario.create(data);
 
-        //Enviar el correo electrónico
+        // Enviar correo
         emailRegistro({
             nombre: usuario.name,
             email: usuario.email,
             token: usuario.token
         })
 
-
         res.render("templates/mensaje",{
             title: "¡Bienvenid@ a BienesRaíces!",
             msg: `La cuenta asociada al correo: ${email}, se ha creado exitosamente, te pedimos confirmar tu a través del correo electrónico que te hemos enviado. `
         })
-
     }
     else 
         res.render("auth/registro", { 
             pagina: "Error al interar crear una cuenta.", 
+            csrfToken: req.csrfToken(),
             errores: resultadoValidacion.array(), 
             usuario: { nombreUsuario: name,
                 emailUsuario: email
             }});
-
-
 }
 
 const paginaConfirmacion = async(req, res) =>
@@ -230,14 +220,21 @@ const resetearPassword = async(req, res) =>
 }
 
 const nuevoPassword = async (req, res) => {
-    await check('nuevoPassword').isLength({ min: 8 }).withMessage('Mínimo 8 caracteres').run(req);
+    // Validaciones
+    await check('nuevoPassword').isLength({ min: 8 }).withMessage('La contraseña debe tener mínimo 8 caracteres').run(req);
+    await check('confirmarPassword').custom((value, { req }) => {
+        if (value !== req.body.nuevoPassword) {
+            throw new Error('Las contraseñas no coinciden');
+        }
+        return true;
+    }).run(req);
     
     let resultado = validationResult(req);
     if (!resultado.isEmpty()) {
         return res.render("auth/resetearPassword", {
             pagina: "Ingresa tu nueva contraseña",
             csrfToken: req.csrfToken(),
-            token: req.params.token,   // <-- necesario para la vista
+            token: req.params.token,
             errores: resultado.array()
         });
     }
@@ -250,7 +247,10 @@ const nuevoPassword = async (req, res) => {
         return res.render("templates/mensaje", {
             title: "Error",
             pagina: "Token inválido",
-            msg: "No se pudo identificar al usuario para el cambio de clave."
+            msg: "No se pudo identificar al usuario para el cambio de clave.",
+            buttonVisibility: true,
+            buttonText: "Volver",
+            buttonURL: "/auth/recuperarPassword"
         });
     }
 
@@ -270,97 +270,80 @@ const nuevoPassword = async (req, res) => {
     });
 };
 
-const autenticarUsuario = async(req,res) => {
+const autenticarUsuario = async(req, res, next) => {
     const {emailUsuario: email, passwordUsuario: password} = req.body
-    console.log(`Un usuario: ${email} con password: ${password}quiere logearse al sistema`);
+    console.log(`Un usuario: ${email} con password: ${password} quiere logearse al sistema`);
 
-    //Validaciones de front campos no vacios
-     await check('emailUsuario').notEmpty().withMessage("El correo electrónico no puede ser vacío").isEmail().withMessage("El correo electrónico no tiene un formato adecuado").run(req)
+    // Validaciones de front
+    await check('emailUsuario').notEmpty().withMessage("El correo electrónico no puede ser vacío").isEmail().withMessage("El correo electrónico no tiene un formato adecuado").run(req)
     await check('passwordUsuario').notEmpty().withMessage("La contraseña parece estar vacía").isLength({ min: 8 , max:30}).withMessage("La longitud de la contraseña debe ser entre 8 y 30 caractéres").run(req);
 
     let resultadoValidacion = validationResult(req);
 
-    if(!resultadoValidacion.isEmpty())
-    {
-        res.render("auth/login", { 
+    if(!resultadoValidacion.isEmpty()) {
+        return res.render("auth/login", { 
             pagina: "Error al intentar ingresar a la plataforma", 
-            errores: resultadoValidacion.array(), 
-            usuario: { emailUsuario: email  }});
-    }
-
-    //Validacion de backend (buscar el usuario en bd)
-    const usuario = await Usuario.findOne({where:{email}});
-
-    if(!usuario)
-    {
-        res.render("auth/login", {
-            pagina: "Error al intentar ingresar a la plataforma",
-            errores: [{"msg": `No existe un usuario asociado a : ${email}`}]
-        })
-    }
-
-    if(usuario.bloqueado){
-    return res.render("auth/login", {
-        pagina: "Inicia sesión",
-        csrfToken: req.csrfToken(),
-        errores: [{ msg: "Cuenta bloqueada. Revisa tu email para desbloquearla." }]
-    });
-}
-
-    //Validacion de backend (si la cuenta esta confirmada)
-    else if(!usuario.confirmed)
-    {
-        res.render("auth/login",{
-            pagina: "Error al intentar ingresar a la plataforma",
-            errores: [{"msg": `La cuenta asociada a : ${email} no a sido confirmado`}]
+            csrfToken: req.csrfToken(),
+            errores: resultadoValidacion.array(),
+            // No pasar usuario
         });
     }
 
-    else
-    {
-        console.log("Validando Contraseñas")
-        console.log("->",usuario.validarPassword(password),"<-");
-    
-            if(!usuario.validarPassword(password))
-{
-    usuario.intentos++;
-    if(usuario.intentos >= 5){
-        usuario.bloqueado = true;
-        usuario.token = generarToken();
-        try {
-            await emailDesbloqueo({ nombre: usuario.name, email: usuario.email, token: usuario.token });
-        } catch (error) {
-            console.error("Error enviando correo de desbloqueo");
-        }
+    const usuario = await Usuario.findOne({where:{email}});
+
+    if(!usuario) {
+        return res.render("auth/login", {
+            pagina: "Error al intentar ingresar a la plataforma",
+            csrfToken: req.csrfToken(),
+            errores: [{msg: `No existe un usuario asociado a : ${email}`}]
+        });
     }
-    await usuario.save();
-    return res.render("auth/login", {
-        pagina: "Inicia sesión",
-        csrfToken: req.csrfToken(),
-        errores: [{ msg: `Contraseña incorrecta. Intentos restantes: ${5 - usuario.intentos}` }],
-        usuario: { emailUsuario: email }
-    });
-}
-        else
-        {
-            usuario.intentos = 0;
-            await usuario.save();
-            req.login(usuario, (err) => {
+
+    if(usuario.bloqueado){
+        return res.render("auth/login", {
+            pagina: "Inicia sesión",
+            csrfToken: req.csrfToken(),
+            errores: [{ msg: "Cuenta bloqueada. Revisa tu email para desbloquearla." }]
+        });
+    }
+
+    if(!usuario.confirmed) {
+        return res.render("auth/login",{
+            pagina: "Error al intentar ingresar a la plataforma",
+            csrfToken: req.csrfToken(),
+            errores: [{msg: `La cuenta asociada a : ${email} no ha sido confirmada`}]
+        });
+    }
+
+    console.log("Validando Contraseñas")
+    console.log("->",usuario.verificarPassword(password),"<-");
+
+    if(!usuario.verificarPassword(password)) {
+        usuario.intentos++;
+        if(usuario.intentos >= 5){
+            usuario.bloqueado = true;
+            usuario.token = generarToken();
+            try {
+                await emailDesbloqueo({ nombre: usuario.name, email: usuario.email, token: usuario.token });
+            } catch (error) {
+                console.error("Error enviando correo de desbloqueo");
+            }
+        }
+        await usuario.save();
+        return res.render("auth/login", {
+            pagina: "Inicia sesión",
+            csrfToken: req.csrfToken(),
+            errores: [{ msg: `Contraseña incorrecta. Intentos restantes: ${5 - usuario.intentos}` }]
+        });
+    } else {
+        usuario.intentos = 0;
+        await usuario.save();
+        req.login(usuario, (err) => {
             if (err) return next(err);
             return res.redirect("/mis-propiedades");
-            });
-            const token =generarJWT(usuario.id);
-            console.log(token);
-            res.render("main/mis-propiedades", {
-                pagina: "Menu principal del usuario",
-            });
-        }
+        });
     }
-
-    //Validacion de backend (comparar contraseñas con correo)
-
-    //Renderizar la pagina de Bienvenida
-}
+};
  
 const cerrarSesion = (req, res, next) => {
     req.logout(function(err) {
