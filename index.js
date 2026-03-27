@@ -1,7 +1,5 @@
-//console.log("Hola desde JS");
 import express from 'express';
 import usuarioroutes from './routes/usuarioroutes.js';
-import { connectDB } from './config/db.js';
 import session from "express-session";
 import cookieParser from "cookie-parser";
 import csurf from "@dr.pogodin/csurf";
@@ -20,85 +18,73 @@ try {
     console.log('Error en la conexión a la DB:', error);
 }
 
-//Crea una constancia de contenedor WEB
 const app = express();
 
-//Habilitar el Template Engine (PUG)
+// Template Engine (PUG)
 app.set("view engine", "pug");
-app.set("views", "./views")
+app.set("views", "./views");
 
-//Definimos el Template Engine (PUG)
-app.use(express.static('public'))
+// Archivos estáticos
+app.use(express.static('public'));
 
-//Habilitar lectura de datos a traves de las peticiones (REQUEST)
-app.use(express.urlencoded({extended: true}))
-// Activamos la opción para poder manipular Cookies - Almacenamiento en el cliente (navegador) 
-app.use(cookieParser());
+// Lectura de datos
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Definimos el Middleware  - 
+// Cookies y sesión
+app.use(cookieParser());
 app.use(session({
-    secret: process.env.SESSION_SECRET||"PC-BienesRaices_240162_csrf_secret",
+    secret: process.env.SESSION_SECRET || "PC-BienesRaices_240162_csrf_secret",
     resave: false,
-    saveUninitialized: false, 
+    saveUninitialized: false,
     cookie: {
-        httpOnly: true, 
+        httpOnly: true,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production"
-        }
-    }));
+    }
+}));
 
+// Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
+// CSRF Protection (única instancia)
 const csrfProtection = csurf({ cookie: true });
 
+// Excluir rutas OAuth del CSRF
 app.use((req, res, next) => {
-    const publicroutes = [
+    const publicRoutes = [
         '/auth/google/callback',
         '/auth/github/callback'
     ];
-    
-    if (publicroutes.some(route => req.path.includes(route))) {
+    if (publicRoutes.some(route => req.path.includes(route))) {
         return next();
     }
     csrfProtection(req, res, next);
 });
 
+// Variables locales para todas las vistas
 app.use((req, res, next) => {
     res.locals.csrfToken = typeof req.csrfToken === 'function' ? req.csrfToken() : null;
-    res.locals.usuario = req.user || null; 
+    res.locals.usuario = req.user || null;  // ← Asegura que usuario siempre exista
     next();
 });
 
+// Rutas
 app.use("/auth", usuarioroutes);
 
+// Página protegida "mis-propiedades"
 app.get('/mis-propiedades', (req, res) => {
     if (!req.isAuthenticated()) {
         return res.redirect('/auth/login');
     }
-
     res.render('main/mis-propiedades', {
         pagina: 'Mis Propiedades',
         usuario: req.user
     });
 });
 
-//Habilitamos el mecanismo para protección de CSRF
-app.use(csurf())
-
-
-// Habilitar los tokes de CSRF para cualquier formulario
-app.use((req, res, next) =>
-{
-    res.locals.csrfToken = req.csrfToken();
-    next();
-});
-
-app.use("/auth", usuarioroutes)
-await connectDB();
-
-// Cachear el error
+// Manejador de errores (incluye CSRF)
 app.use((err, req, res, next) => {
     if (err.code === "EBADCSRFTOKEN") {
         return res.status(403).render("templates/mensaje", {
@@ -115,6 +101,7 @@ app.use((err, req, res, next) => {
     next(err);
 });
 
-app.listen(process.env.PORT ?? 4000, ()=> {
-    console.log(`El servidor esta iniciado en el puerto ${process.env.PORT}`)
-})
+const PORT = process.env.PORT ?? 4000;
+app.listen(PORT, () => {
+    console.log(`El servidor está iniciado en el puerto ${PORT}`);
+});

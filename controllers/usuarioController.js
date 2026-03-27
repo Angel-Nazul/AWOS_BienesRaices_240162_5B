@@ -400,4 +400,14 @@ const actualizarFoto = async (req, res) => {
     }
 };
 
+export const misPropiedades = (req, res) => {
+    // Asegúrate de que el usuario esté autenticado
+    if (!req.user) {
+        return res.redirect('/auth/login');
+    }
+    res.render('main/mis-propiedades', { 
+        usuario: req.user  // pasa los datos del usuario a la vista
+    });
+};
+
 export { formularioLogin, formularioRegistro, registrarUsuario, formularioRecuperacion, paginaConfirmacion, resetearPassword, formularioActualizacionPassword, autenticarUsuario, nuevoPassword, cerrarSesion, desbloquearCuenta,formularioEditarFoto, actualizarFoto}

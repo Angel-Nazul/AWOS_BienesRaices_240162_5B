@@ -41,7 +41,36 @@ El proyecto estara basado en una Arquitectura SOA (Service Oriented Architecture
 
 ## Resultados Obtenidos
 ```
-Posteriormente se ubicaran imagenenes del proyecto.
+![Interaccion Rotativa](screenshots/images/Login-a-RecuperarPassword.png)
+![Interaccion Rotativa](screenshots/images/Login-a-Registro.png)
+![Interaccion Rotativa](screenshots/images/RecuperarPassword-a-Registro.png)
+![Interaccion Rotativa](screenshots/images/Registro-a-Login.png)
+![Interaccion Rotativa](screenshots/images/Registro-a-RecuperarPassword.png)
+
+![Registro Uusario](screenshots/images/Registro-usuario1.png)
+![Registro Uusario](screenshots/images/Registro-usuario2.png)
+![Registro Uusario](screenshots/images/Registro-usuario3.png)
+![Registro Uusario](screenshots/images/Registro-usuario4.png)
+
+![Registro Uusario Fallido](screenshots/images/Registrofallido.png)
+
+![Registro Uusario Fallido](screenshots/images/GmailDuplicado.png)
+
+![Actualizacion de Contraseña](screenshots/images/Actualizacontraseña1.png)
+![Actualizacion de Contraseña](screenshots/images/Actualizacontraseña2.png)
+![Actualizacion de Contraseña](screenshots/images/Actualizacontraseña3.png)
+![Actualizacion de Contraseña](screenshots/images/Actualizacontraseña4.png)
+![Actualizacion de Contraseña](screenshots/images/Actualizacontraseña5.png)
+
+![Actualizacion de Contraseña Fallida](screenshots/images/Actualizarcontraseñafallida.png)
+
+![Logeo de Usuario Exitoso](screenshots/images/LogeoExitoso.png)
+
+![Bloque de Cuenta](screenshots/images/BloqueCuenta1.png)
+![Bloque de Cuenta](screenshots/images/BloqueCuenta2.png)
+
+![Desbloque de Cuenta](screenshots/images/Desbloque1.png)
+![Desbloque de Cuenta](screenshots/images/Desbloque2.png)
 ```
 
 

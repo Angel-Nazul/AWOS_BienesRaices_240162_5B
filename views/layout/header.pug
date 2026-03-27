@@ -11,8 +11,8 @@ header.bg-red-600.p-4
             img(src=usuario.imagen class="w-8 h-8 rounded-full border-2 border-white" alt="Avatar")
           else
             div.w-8.h-8.bg-red-600.rounded-full.flex.items-center.justify-center.border.border-white
-              span.text-xs.text-white #{usuario.name.charAt(0).toUpperCase()}
-            span.font-medium Hola, #{usuario.name.split(' ')[0]}
+              span.text-xs.text-white #{usuario.name ? usuario.name.charAt(0).toUpperCase() : ''}
+            span.font-medium Hola, #{usuario.name ? usuario.name.split(' ')[0] : ''}
         a(href="/mis-propiedades" class="hover:text-red-200 transition-colors") Mis Propiedades
         a(href="/auth/perfil" class="hover:text-red-200 transition-colors") Mi Perfil
         a(href="/auth/logout" class="bg-red-800 py-2 px-6 rounded-lg hover:bg-red-600 transition-all duration-300") Cerrar Sesión
