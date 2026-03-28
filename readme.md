@@ -1,4 +1,4 @@
-## Proyecto de Clase: Sistema de Bienes Ra��ces
+## Proyecto de Clase: Sistema de Bienes Raices 240162
 ---
 <p align="justify">
 En este proyecto se prondan en ejemplo practico la creacion de API's propias asi como el consumo de APIs de Terceros Gestion de Mapas, Envio de Correos, Autentificacion por Redes Sociales, Gestion de Bases de Datos, Gestion de Archivos, Seguridad, Control de Sesiones y validaciones. En el contexto real de la compra, venta o renta de propiedades.</p>
@@ -41,33 +41,33 @@ El proyecto estara basado en una Arquitectura SOA (Service Oriented Architecture
 
 ## Resultados Obtenidos
 
-![Interacción Rotativa](screenshots/images/Login-a-RecuperarPassword.png)
-![Interacción Rotativa](screenshots/images/Login-a-Registro.png)
-![Interacción Rotativa](screenshots/images/RecuperarPassword-a-Registro.png)
-![Interacción Rotativa](screenshots/images/Registro-a-Login.png)
-![Interacción Rotativa](screenshots/images/Registro-a-RecuperarPassword.png)
+![Interacción Rotativa](evidencias/Login-a-RecuperarPassword.png)
+![Interacción Rotativa](evidencias/Login-a-Registro.png)
+![Interacción Rotativa](evidencias/RecuperarPassword-a-Registro.png)
+![Interacción Rotativa](evidencias/Registro-a-Login.png)
+![Interacción Rotativa](evidencias/Registro-a-RecuperarPassword.png)
 
-![Registro Usuario](screenshots/images/Registro-usuario1.png)
-![Registro Usuario](screenshots/images/Registro-usuario2.png)
-![Registro Usuario](screenshots/images/Registro-usuario3.png)
-![Registro Usuario](screenshots/images/Registro-usuario4.png)
+![Registro Usuario](evidencias/Registro-usuario1.png)
+![Registro Usuario](evidencias/Registro-usuario2.png)
+![Registro Usuario](evidencias/Registro-usuario3.png)
+![Registro Usuario](evidencias/Registro-usuario4.png)
 
-![Registro Usuario Fallido](screenshots/images/Registrofallido.png)
+![Registro Usuario Fallido](evidencias/Registrofallido.png)
 
-![Registro Usuario Fallido](screenshots/images/GmailDuplicado.png)
+![Registro Usuario Fallido](evidencias/GmailDuplicado.png)
 
-![Actualización de Contraseña](screenshots/images/Actualizacontrasena1.png)
-![Actualización de Contraseña](screenshots/images/Actualizacontrasena2.png)
-![Actualización de Contraseña](screenshots/images/Actualizacontrasena3.png)
-![Actualización de Contraseña](screenshots/images/Actualizacontrasena4.png)
-![Actualización de Contraseña](screenshots/images/Actualizacontrasena5.png)
+![Actualización de Contraseña](evidencias/Actualizacontrasena1.png)
+![Actualización de Contraseña](evidencias/Actualizacontrasena2.png)
+![Actualización de Contraseña](evidencias/Actualizacontrasena3.png)
+![Actualización de Contraseña](evidencias/Actualizacontrasena4.png)
+![Actualización de Contraseña](evidencias/Actualizacontrasena5.png)
 
-![Actualización de Contraseña Fallida](screenshots/images/Actualizacontrasenafallida.png)
+![Actualización de Contraseña Fallida](evidencias/Actualizacontrasenafallida.png)
 
-![Logeo de Usuario Exitoso](screenshots/images/LogeoExitoso.png)
+![Logeo de Usuario Exitoso](evidencias/LogeoExitoso.png)
 
-![Bloque de Cuenta](screenshots/images/BloqueCuenta1.png)
-![Bloque de Cuenta](screenshots/images/BloqueCuenta2.png)
+![Bloque de Cuenta](evidencias/BloqueCuenta1.png)
+![Bloque de Cuenta](evidencias/BloqueCuenta2.png)
 
 ### Creado por: 
 Angel Nazul Gutierrez Cruz - 240162.
