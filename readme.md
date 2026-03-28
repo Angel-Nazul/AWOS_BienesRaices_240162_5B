@@ -58,11 +58,11 @@ El proyecto estara basado en una Arquitectura SOA (Service Oriented Architecture
 
 ![Actualización de Contraseña](evidencias/Actualizacontrasena1.png)
 ![Actualización de Contraseña](evidencias/Actualizacontrasena2.png)
-![Actualización de Contraseña](evidencias/Actualizacontrasena3.png)
-![Actualización de Contraseña](evidencias/Actualizacontrasena4.png)
-![Actualización de Contraseña](evidencias/Actualizacontrasena5.png)
+![Actualización de Contraseña](evidencias/Actualizarcontrasena3.png)
+![Actualización de Contraseña](evidencias/Actualizarcontrasena4.png)
+![Actualización de Contraseña](evidencias/Actualizarcontrasena5.png)
 
-![Actualización de Contraseña Fallida](evidencias/Actualizacontrasenafallida.png)
+![Actualización de Contraseña Fallida](evidencias/Actualizarcontrasenafallida.png)
 
 ![Logeo de Usuario Exitoso](evidencias/LogeoExitoso.png)
 
