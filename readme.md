@@ -40,7 +40,7 @@ El proyecto estara basado en una Arquitectura SOA (Service Oriented Architecture
 
 
 ## Resultados Obtenidos
-```
+
 ![Interacción Rotativa](screenshots/images/Login-a-RecuperarPassword.png)
 ![Interacción Rotativa](screenshots/images/Login-a-Registro.png)
 ![Interacción Rotativa](screenshots/images/RecuperarPassword-a-Registro.png)
@@ -68,8 +68,6 @@ El proyecto estara basado en una Arquitectura SOA (Service Oriented Architecture
 
 ![Bloque de Cuenta](screenshots/images/BloqueCuenta1.png)
 ![Bloque de Cuenta](screenshots/images/BloqueCuenta2.png)
-```
-
 
 ### Creado por: 
 Angel Nazul Gutierrez Cruz - 240162.
